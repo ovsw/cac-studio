@@ -53,10 +53,11 @@ export default {
       title: 'Section',
       name: 'section',
       type: 'string',
+      hidden: 'true',
       options: {
         list: [
           {title: 'Prospective Families', value: 'Prospective Families'},
-          {title: 'About us', value: 'About Laurelwood'},
+          {title: 'About CAC', value: 'About CAC'},
           {title: 'Current Families', value: 'Current Families'},
           {title: 'NCCP & Adult Camp', value: 'NCCP & Adult Camp'},
           {title: 'Staff', value: 'Staff'}

@@ -26,8 +26,8 @@ export default {
                 // },
                 {
                   buildHookId: '5e44430ef2181835149ff124',
-                  title: 'Laurelwood Website Front-End',
-                  name: 'lrw-app',
+                  title: 'CAC Website Front-End',
+                  name: 'cac-app',
                   apiId: 'cb21f6f2-55e1-4281-bd36-8487d1540f2b'
                 }
               ]
