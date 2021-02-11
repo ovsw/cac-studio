@@ -289,11 +289,11 @@ export default () =>
         .title('News Items')
         .schemaType('post')
         .child(S.documentTypeList('post').title('News Items')),
-      S.listItem()
-        .title('Interactive Map')
-        .icon(MdMap)
-        .schemaType('mapMarker')
-        .child(S.documentTypeList('mapMarker').title('Map Markers')),
+      // S.listItem()
+      //   .title('Interactive Map')
+      //   .icon(MdMap)
+      //   .schemaType('mapMarker')
+      //   .child(S.documentTypeList('mapMarker').title('Map Markers')),
       // S.listItem()
       //   .title('Authors')
       //   .icon(MdPerson)
