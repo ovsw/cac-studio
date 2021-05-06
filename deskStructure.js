@@ -1,6 +1,7 @@
 import React from 'react'
 import S from '@sanity/desk-tool/structure-builder'
 import { MdSettings, MdFolder, MdMap, MdHome, MdEdit, MdVisibility } from 'react-icons/md'
+import { FaComment } from 'react-icons/fa'
 
 const hiddenDocTypes = (listItem) =>
   !['category', 'author', 'post', 'page', 'siteSettings', 'mapMarker'].includes(listItem.getId())
@@ -347,6 +348,11 @@ export default () =>
         .title('Blog Authors')
         .schemaType('author')
         .child(S.documentTypeList('author').title('Blog Authors')),
+      S.divider(),
+      S.listItem()
+        .title('Testimonials')
+        .icon(FaComment)
+        .child(S.documentTypeList('testimonial').title('Testimonials')),
       S.divider(),
       S.listItem()
         .title('FAQ Items')

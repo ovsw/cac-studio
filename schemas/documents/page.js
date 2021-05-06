@@ -58,6 +58,8 @@ export default {
             { type: 'ctaSection' },
             { type: 'faqSection' },
             { type: 'bigHeading' },
+            { type: 'testimonialSection' },
+            { type: 'testimonialsSection' },
             { type: 'reusedSection' },
             // {type: 'bigHeading'},
             // {type: 'tableSection'},

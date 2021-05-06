@@ -16,6 +16,7 @@ import post from './documents/post'
 import reusableSection from './documents/reusableSection'
 import siteHome from './documents/siteHome'
 import siteSettings from './documents/siteSettings'
+import testimonial from './documents/testimonial'
 
 // Object types
 import avatarImage from './objects/avatarImage'
@@ -44,6 +45,8 @@ import ctaSection from './objects/sections/cta'
 import faqSection from './objects/sections/faqSection'
 import magSection from './objects/sections/magazine'
 import reusedSection from './objects/sections/reusedSection'
+import testimonialSection from './objects/sections/testimonialSection'
+import testimonialsSection from './objects/sections/testimonialsSection'
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -63,6 +66,7 @@ export default createSchema({
     reusableSection,
     siteHome,
     siteSettings,
+    testimonial,
     // objects
     author,
     authorReference,
@@ -91,6 +95,8 @@ export default createSchema({
     faqSection,
     magSection,
     reusedSection,
+    testimonialSection,
+    testimonialsSection,
 
     // When added to this list, object types can be used as
     // { type: 'typename' } in other document schemas

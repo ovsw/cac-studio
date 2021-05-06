@@ -1,4 +1,4 @@
-import Tabs from "sanity-plugin-tabs"
+import Tabs from 'sanity-plugin-tabs'
 
 export default {
   name: 'siteHome',
@@ -13,16 +13,16 @@ export default {
       title: 'Content',
       inputComponent: Tabs,
       fieldsets: [
-        {name: 'hero', title: 'Hero'},
-        {name: 'main', title: 'Main'},
-        {name: 'seo', title: 'SEO'}
+        { name: 'hero', title: 'Hero' },
+        { name: 'main', title: 'Main' },
+        { name: 'seo', title: 'SEO' },
       ],
       fields: [
         {
           fieldset: 'hero',
           name: 'hero',
           title: 'Hero',
-          type: 'hero'
+          type: 'hero',
         },
         {
           fieldset: 'main',
@@ -30,15 +30,14 @@ export default {
           title: 'Homepage Content Sections',
           type: 'array',
           of: [
-            {type: 'magSection'},
-            {type: 'ctaSection'},
-            // {type: 'bigHeading'},
-            // {type: 'tableSection'},
-            // {type: 'faqSection'},
-            // {type: 'cardSection'},
-            // {type: 'menuSection'},
-            // {type: 'reusedSection'}
-          ]
+            { type: 'magSection' },
+            { type: 'ctaSection' },
+            { type: 'faqSection' },
+            { type: 'bigHeading' },
+            { type: 'testimonialSection' },
+            { type: 'testimonialsSection' },
+            { type: 'reusedSection' },
+          ],
         },
         {
           fieldset: 'seo',
@@ -46,16 +45,15 @@ export default {
           title: 'SEO Title',
           type: 'seo',
         },
-      ]
-    }
+      ],
+    },
   ],
   preview: {
-    select: {
-    },
-    prepare () {
+    select: {},
+    prepare() {
       return {
-        title: 'Site Home'
+        title: 'Site Home',
       }
-    }
-  }
+    },
+  },
 }
