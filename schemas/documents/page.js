@@ -1,5 +1,6 @@
 // import {format} from 'date-fns'
-import {FiFile} from 'react-icons/fi'
+import Tabs from 'sanity-plugin-tabs'
+import { FiFile } from 'react-icons/fi'
 
 export default {
   name: 'page',
@@ -7,76 +8,94 @@ export default {
   type: 'document',
   icon: FiFile,
   liveEdit: false,
-  __experimental_actions: [ 'create', 'update', 'publish', 'delete' ], /* 'create', 'delete' */
-  fieldsets: [
-    {title: 'SEO Info',
-      name: 'seo',
-      options: {collapsible: true, collapsed: true}
-    }
-  ],
+  __experimental_actions: ['create', 'update', 'publish', 'delete'] /* 'create', 'delete' */,
+
   fields: [
     {
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      fieldset: 'seo'
-    },
-    {
-      name: 'seoDescription',
-      title: 'SEO Description',
-      type: 'text',
-      fieldset: 'seo'
-    },
-    {
-      name: 'title',
-      title: 'Title',
-      type: 'string'
-    },
-    // {
-    //   name: 'longTitle',
-    //   title: 'Long Title (optional)',
-    //   type: 'string',
-    //   description: 'This is the main heading of the page. If left empty, the "Title" field above will be used instead.'
-    // },
-    {
-      name: 'slug',
-      type: 'slug',
-      title: 'Slug',
-      validation: Rule => Rule.error('You have to fill out the slug of the page.').required(),
-      description: 'Some frontends will require a slug to be set to be able to show the post',
-      options: {
-        source: 'title',
-        maxLength: 96
-      }
+      name: 'content',
+      type: 'object',
+      title: 'Content',
+      inputComponent: Tabs,
+      fieldsets: [
+        { name: 'main', title: 'Main' },
+        { name: 'settings', title: 'Settings' },
+        { name: 'seo', title: 'SEO' },
+      ],
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          fieldset: 'main',
+        },
+        {
+          name: 'slug',
+          type: 'slug',
+          title: 'Slug',
+          validation: (Rule) => Rule.error('You have to fill out the slug of the page.').required(),
+          description:
+            'part of the URL of the page in the fron-end. The page URL will be: https://www.canadianadventurecamp.com/[whatever-you-type-here]/',
+          options: {
+            source: 'content.title',
+            maxLength: 96,
+          },
+          fieldset: 'settings',
+        },
+        {
+          name: 'headerImage',
+          title: 'Header Image',
+          type: 'mainImage',
+          fieldset: 'settings',
+        },
+        {
+          fieldset: 'main',
+          name: 'sections',
+          title: 'Page Content Sections',
+          description: 'the modular content sections for this page',
+          type: 'array',
+          of: [
+            { type: 'magSection' },
+            { type: 'ctaSection' },
+            { type: 'faqSection' },
+            { type: 'bigHeading' },
+            { type: 'reusedSection' },
+            // {type: 'bigHeading'},
+            // {type: 'tableSection'},
+            // {type: 'cardSection'},
+          ],
+        },
+        {
+          fieldset: 'seo',
+          name: 'seo',
+          title: ' ',
+          type: 'seo',
+        },
+      ],
     },
     {
       title: 'Section',
       name: 'section',
       type: 'string',
-      hidden: 'true',
+      hidden: true,
       options: {
         list: [
-          {title: 'Prospective Families', value: 'Prospective Families'},
-          {title: 'About CAC', value: 'About CAC'},
-          {title: 'Current Families', value: 'Current Families'},
-          {title: 'NCCP & Adult Camp', value: 'NCCP & Adult Camp'},
-          {title: 'Staff', value: 'Staff'}
+          { title: 'Prospective Families', value: 'Prospective Families' },
+          { title: 'About CAC', value: 'About CAC' },
+          { title: 'Current Families', value: 'Current Families' },
+          { title: 'NCCP & Adult Camp', value: 'NCCP & Adult Camp' },
+          { title: 'Staff', value: 'Staff' },
         ],
         layout: 'radio',
-        direction: 'horizontal'
+        direction: 'horizontal',
       },
-      validation: Rule => Rule.error('You have to select which side menu to show for this page.').required()
+      validation: (Rule) =>
+        Rule.error('You have to select which side menu to show for this page.').required(),
     },
-    {
-      name: 'headerImage',
-      title: 'Header Image',
-      type: 'mainImage'
-    },
-    {
-      name: 'body',
-      title: 'Body',
-      type: 'bodyPortableText'
-    }
+    // {
+    //   name: 'body',
+    //   title: 'Body',
+    //   type: 'bodyPortableText',
+    // },
   ],
   orderings: [
     {
@@ -85,24 +104,24 @@ export default {
       by: [
         {
           field: '_createdAt',
-          direction: 'asc'
-        }
-      ]
-    }
+          direction: 'asc',
+        },
+      ],
+    },
   ],
   preview: {
     select: {
-      title: 'title',
-      slug: 'slug',
-      media: 'headerImage'
+      title: 'content.title',
+      slug: 'content.slug',
+      media: 'content.headerImage',
     },
-    prepare ({title = 'No title', slug = {}, media}) {
+    prepare({ title = 'No title', slug = {}, media }) {
       const path = `/${slug.current}/`
       return {
         title,
         media,
-        subtitle: path
+        subtitle: path,
       }
-    }
-  }
+    },
+  },
 }

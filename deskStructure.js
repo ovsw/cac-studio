@@ -1,22 +1,46 @@
+import React from 'react'
 import S from '@sanity/desk-tool/structure-builder'
-import {MdSettings, MdFolder, MdMap} from 'react-icons/md/'
+import { MdSettings, MdFolder, MdMap, MdHome, MdEdit, MdVisibility } from 'react-icons/md'
 
-const hiddenDocTypes = listItem =>
+const hiddenDocTypes = (listItem) =>
   !['category', 'author', 'post', 'page', 'siteSettings', 'mapMarker'].includes(listItem.getId())
+
+const url = 'https://cac-web3.netlify.app/'
+
+const WebPreview = ({ document }) => {
+  const { displayed } = document
+  const slug = displayed.content.slug?.current
+
+  if (!slug) {
+    return <h1>Please set a slug to see a preview</h1>
+  }
+
+  const targetURL = url + slug + `/?preview=true`
+  return <iframe src={targetURL} frameBorder={0} width="100%" height="100%" />
+}
+
+export const getDefaultDocumentNode = ({ schemaType }) => {
+  // Only show the iframe for documents for which a preview makes sense.
+  if (schemaType === 'page') {
+    return S.document().views([
+      S.view.form().icon(MdEdit),
+      S.view.component(WebPreview).title('Web Preview').icon(MdVisibility),
+    ])
+  }
+}
 
 export default () =>
   S.list()
     .title('Content')
     .items([
       S.listItem()
+        .title('Home Page')
+        .icon(MdHome)
+        .child(S.editor().id('siteHome').schemaType('siteHome').documentId('siteHome')),
+      S.listItem()
         .title('Settings')
         .icon(MdSettings)
-        .child(
-          S.editor()
-            .id('siteSettings')
-            .schemaType('siteSettings')
-            .documentId('siteSettings')
-        ),
+        .child(S.editor().id('siteSettings').schemaType('siteSettings').documentId('siteSettings')),
       S.listItem()
         .title('Pages')
         .child(
@@ -67,7 +91,7 @@ export default () =>
                               S.documentListItem()
                                 .id('waterskyWakeboardProgram')
                                 .title('Waterski & Wakeboard')
-                                .schemaType('page')
+                                .schemaType('page'),
                             ])
                         )
                         .icon(MdFolder),
@@ -83,10 +107,7 @@ export default () =>
                         .id('internationalCampers')
                         .title('International Campers')
                         .schemaType('page'),
-                      S.documentListItem()
-                        .id('faqs')
-                        .title('FAQs')
-                        .schemaType('page'),
+                      S.documentListItem().id('faqs').title('FAQs').schemaType('page'),
                       S.documentListItem()
                         .id('datesAndRates')
                         .title('Dates & Rates')
@@ -94,14 +115,11 @@ export default () =>
                       S.documentListItem()
                         .id('testimoanials')
                         .title('Testimonials')
-                        .schemaType('page')
+                        .schemaType('page'),
                     ])
                 )
                 .icon(MdFolder),
-              S.documentListItem()
-                .id('about')
-                .title('About')
-                .schemaType('page'),
+              S.documentListItem().id('about').title('About').schemaType('page'),
               S.listItem()
                 .title('About Section Pages')
                 .id('aboutSection')
@@ -129,18 +147,12 @@ export default () =>
                         .id('membershipsPartnerships')
                         .title('Memberships & Partnerships')
                         .schemaType('page'),
-                      S.documentListItem()
-                        .id('alumni')
-                        .title('Alumni')
-                        .schemaType('page'),
+                      S.documentListItem().id('alumni').title('Alumni').schemaType('page'),
                       S.documentListItem()
                         .id('photoGallery')
                         .title('Photo Gallery')
                         .schemaType('page'),
-                      S.documentListItem()
-                        .id('videos')
-                        .title('Videos')
-                        .schemaType('page')
+                      S.documentListItem().id('videos').title('Videos').schemaType('page'),
                     ])
                 )
                 .icon(MdFolder),
@@ -161,7 +173,7 @@ export default () =>
                         .schemaType('page'),
                       S.documentListItem()
                         .id('parentsGuide')
-                        .title('Parent\'s Guide')
+                        .title("Parent's Guide")
                         .schemaType('page'),
                       S.documentListItem()
                         .id('gettingToCamp')
@@ -185,7 +197,7 @@ export default () =>
                               S.documentListItem()
                                 .id('internationalCampersTravel')
                                 .title('International Campers')
-                                .schemaType('page')
+                                .schemaType('page'),
                             ])
                         )
                         .icon(MdFolder),
@@ -202,12 +214,12 @@ export default () =>
                             .items([
                               S.documentListItem()
                                 .id('visitorDays')
-                                .title('Visitor\'s Days')
+                                .title("Visitor's Days")
                                 .schemaType('page'),
                               S.documentListItem()
                                 .id('placesToStay')
                                 .title('Places to Stay')
-                                .schemaType('page')
+                                .schemaType('page'),
                             ])
                         )
                         .icon(MdFolder),
@@ -215,14 +227,11 @@ export default () =>
                         .id('campPictures')
                         .title('Camp Pictures')
                         .schemaType('page'),
-                      S.documentListItem()
-                        .id('campVideo')
-                        .title('Camp Video')
-                        .schemaType('page'),
+                      S.documentListItem().id('campVideo').title('Camp Video').schemaType('page'),
                       S.documentListItem()
                         .id('parentLogin')
                         .title('Parent Log-in')
-                        .schemaType('page')
+                        .schemaType('page'),
                     ])
                 ),
               S.documentListItem()
@@ -237,20 +246,14 @@ export default () =>
                   S.list()
                     .title('NCCP & Adult Camp Pages')
                     .items([
-                      S.documentListItem()
-                        .id('adultCamp')
-                        .title('Adult Camp')
-                        .schemaType('page'),
+                      S.documentListItem().id('adultCamp').title('Adult Camp').schemaType('page'),
                       S.documentListItem()
                         .id('nccpCourses')
                         .title('NCCP Courses')
-                        .schemaType('page')
+                        .schemaType('page'),
                     ])
                 ),
-              S.documentListItem()
-                .id('staff')
-                .title('Staff')
-                .schemaType('page'),
+              S.documentListItem().id('staff').title('Staff').schemaType('page'),
               S.listItem()
                 .title('Staff Pages')
                 .icon(MdFolder)
@@ -269,26 +272,62 @@ export default () =>
                       S.documentListItem()
                         .id('communityInitiatives')
                         .title('Community Initiatives')
-                        .schemaType('page')
+                        .schemaType('page'),
                     ])
                 ),
               S.documentListItem()
-                .id('termsAndConditions')
-                .title('Terms & Conditions')
+                .id('youthLeadershipProgram')
+                .title('Youth Leadership Program')
                 .schemaType('page'),
+
+              S.listItem()
+                .title('Youth Leadership Program Pages')
+                .icon(MdFolder)
+                .child(
+                  S.list()
+                    .title('YLP Pages')
+                    .items([
+                      S.documentListItem()
+                        .id('leadershipProgramOne')
+                        .title('Leadership One')
+                        .schemaType('page'),
+                      S.documentListItem()
+                        .id('leadershipProgramTwo')
+                        .title('Leadership Two')
+                        .schemaType('page'),
+                      S.documentListItem()
+                        .id('juniorStaff')
+                        .title('Junior Staff')
+                        .schemaType('page'),
+                    ])
+                ),
+              S.documentListItem().id('joinOurTeam').title('Join Our Team').schemaType('page'),
               S.documentListItem()
-                .id('privacyPolicy')
-                .title('Privacy Policy')
-                .schemaType('page'),
-              S.documentListItem()
-                .id('contact')
-                .title('Contact')
-                .schemaType('page')
-            ])),
+                .id('blogHome')
+                .title('News / Blog Home Page')
+                .schemaType('pageSpecial'),
+            ])
+        ),
       S.listItem()
-        .title('News Items')
+        .title('Reusable Sections')
+        .schemaType('reusableSection')
+        .child(S.documentTypeList('reusableSection').title('Reusable Sections')),
+      S.listItem()
+        .title('Blog Posts')
         .schemaType('post')
-        .child(S.documentTypeList('post').title('News Items')),
+        .child(S.documentTypeList('post').title('Blog Posts')),
+      S.listItem()
+        .title('FAQ Items')
+        .schemaType('faqItem')
+        .child(S.documentTypeList('faqItem').title('FAQ Items')),
+      S.listItem()
+        .title('Support Pages')
+        .schemaType('pageSupport')
+        .child(S.documentTypeList('pageSupport').title('Support Pages')),
+      S.listItem()
+        .title('Simple Pages')
+        .schemaType('pageSimple')
+        .child(S.documentTypeList('pageSimple').title('Simple Pages')),
       // S.listItem()
       //   .title('Interactive Map')
       //   .icon(MdMap)
@@ -306,5 +345,5 @@ export default () =>
       // This returns an array of all the document types
       // defined in schema.js. We filter out those that we have
       // defined the structure above
-      ...S.documentTypeListItems().filter(hiddenDocTypes)
+      // ...S.documentTypeListItems().filter(hiddenDocTypes)
     ])

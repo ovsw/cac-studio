@@ -1,72 +1,80 @@
-import {format} from 'date-fns'
+import Tabs from 'sanity-plugin-tabs'
+import { FiFile } from 'react-icons/fi'
+import { format } from 'date-fns'
 
 export default {
   name: 'post',
-  type: 'document',
   title: 'Blog Post',
+  type: 'document',
+  icon: FiFile,
+  liveEdit: false,
+  __experimental_actions: ['create', 'update', 'publish', 'delete'] /* 'create', 'delete' */,
   fields: [
     {
-      name: 'title',
-      type: 'string',
-      title: 'Title',
-      description: 'Titles should be catchy, descriptive, and not too long'
+      name: 'content',
+      type: 'object',
+      title: 'Content',
+      inputComponent: Tabs,
+      fieldsets: [
+        { name: 'main', title: 'Main' },
+        { name: 'settings', title: 'Settings' },
+        { name: 'seo', title: 'SEO' },
+      ],
+      fields: [
+        {
+          fieldset: 'main',
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+        },
+        {
+          fieldset: 'main',
+          name: 'publishedAt',
+          type: 'datetime',
+          title: 'Published at',
+          description: 'This can be used to schedule post for publishing',
+        },
+        {
+          fieldset: 'main',
+          name: 'excerpt',
+          type: 'text',
+          title: 'Excerpt',
+          description:
+            'This ends up on summary pages, on Google, when people share your post in social media.',
+        },
+        {
+          fieldset: 'settings',
+          name: 'slug',
+          type: 'slug',
+          title: 'Slug',
+          validation: (Rule) => Rule.error('You have to fill out the slug of the page.').required(),
+          description: 'Some frontends will require a slug to be set to be able to show the post',
+          options: {
+            source: 'content.title',
+            maxLength: 96,
+          },
+        },
+        {
+          fieldset: 'main',
+          name: 'body',
+          title: 'Body',
+          type: 'bodyPortableText',
+        },
+        {
+          fieldset: 'settings',
+          name: 'image',
+          title: 'Header Image',
+          type: 'mainImage',
+          validation: (Rule) => Rule.required().error('page header image missing'),
+        },
+        {
+          fieldset: 'seo',
+          name: 'seo',
+          title: 'SEO Title',
+          type: 'seo',
+        },
+      ],
     },
-    {
-      name: 'slug',
-      type: 'slug',
-      title: 'Slug',
-      description: 'Some frontends will require a slug to be set to be able to show the post',
-      options: {
-        source: 'title',
-        maxLength: 96
-      }
-    },
-    {
-      name: 'publishedAt',
-      type: 'datetime',
-      title: 'Published at',
-      description: 'This can be used to schedule post for publishing'
-    },
-    {
-      name: 'mainImage',
-      type: 'mainImage',
-      title: 'Main image'
-    },
-    {
-      name: 'excerpt',
-      type: 'excerptPortableText',
-      title: 'Excerpt',
-      description:
-        'This ends up on summary pages, on Google, when people share your post in social media.'
-    },
-    // {
-    //   name: 'authors',
-    //   title: 'Authors',
-    //   type: 'array',
-    //   of: [
-    //     {
-    //       type: 'authorReference'
-    //     }
-    //   ]
-    // },
-    // {
-    //   name: 'categories',
-    //   type: 'array',
-    //   title: 'Categories',
-    //   of: [
-    //     {
-    //       type: 'reference',
-    //       to: {
-    //         type: 'category'
-    //       }
-    //     }
-    //   ]
-    // },
-    {
-      name: 'body',
-      type: 'bodyPortableText',
-      title: 'Body'
-    }
   ],
   orderings: [
     {
@@ -74,45 +82,47 @@ export default {
       title: 'Publishing date new–>old',
       by: [
         {
-          field: 'publishedAt',
-          direction: 'asc'
+          field: 'content.publishedAt',
+          direction: 'asc',
         },
         {
-          field: 'title',
-          direction: 'asc'
-        }
-      ]
+          field: 'content.title',
+          direction: 'asc',
+        },
+      ],
     },
     {
       name: 'publishingDateDesc',
       title: 'Publishing date old->new',
       by: [
         {
-          field: 'publishedAt',
-          direction: 'desc'
+          field: 'content.publishedAt',
+          direction: 'desc',
         },
         {
-          field: 'title',
-          direction: 'asc'
-        }
-      ]
-    }
+          field: 'content.title',
+          direction: 'asc',
+        },
+      ],
+    },
   ],
   preview: {
     select: {
-      title: 'title',
-      publishedAt: 'publishedAt',
-      slug: 'slug',
-      media: 'mainImage'
+      title: 'content.title',
+      publishedAt: 'content.publishedAt',
+      slug: 'content.slug',
+      media: 'content.image',
     },
-    prepare ({title = 'No title', publishedAt, slug = {}, media}) {
+    prepare({ title = 'No title', publishedAt, slug = {}, media }) {
       const dateSegment = format(publishedAt, 'YYYY/MM')
+      const subtitle = format(publishedAt, 'DD/MM/YYYY')
       const path = `/${dateSegment}/${slug.current}/`
       return {
         title,
         media,
-        subtitle: publishedAt ? path : 'Missing publishing date'
+        subtitle: publishedAt ? subtitle : 'Missing publishing date',
+        description: publishedAt ? path : 'Missing publishing date',
       }
-    }
-  }
+    },
+  },
 }
