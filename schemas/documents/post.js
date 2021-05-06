@@ -23,9 +23,18 @@ export default {
       fields: [
         {
           fieldset: 'main',
+          name: 'author',
+          title: 'Author',
+          description: 'optional',
+          type: 'reference',
+          to: [{ type: 'author' }],
+        },
+        {
+          fieldset: 'main',
           name: 'title',
           title: 'Title',
           type: 'string',
+          validation: (Rule) => Rule.error('missing post title.').required(),
         },
         {
           fieldset: 'main',
@@ -33,6 +42,7 @@ export default {
           type: 'datetime',
           title: 'Published at',
           description: 'This can be used to schedule post for publishing',
+          validation: (Rule) => Rule.error('missing post publish date').required(),
         },
         {
           fieldset: 'main',
@@ -41,6 +51,7 @@ export default {
           title: 'Excerpt',
           description:
             'This ends up on summary pages, on Google, when people share your post in social media.',
+          validation: (Rule) => Rule.error('missing post exerpt').required(),
         },
         {
           fieldset: 'settings',

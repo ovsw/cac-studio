@@ -312,10 +312,16 @@ export default () =>
         .title('Reusable Sections')
         .schemaType('reusableSection')
         .child(S.documentTypeList('reusableSection').title('Reusable Sections')),
+      S.divider(),
       S.listItem()
         .title('Blog Posts')
         .schemaType('post')
         .child(S.documentTypeList('post').title('Blog Posts')),
+      S.listItem()
+        .title('Blog Authors')
+        .schemaType('author')
+        .child(S.documentTypeList('author').title('Blog Authors')),
+      S.divider(),
       S.listItem()
         .title('FAQ Items')
         .schemaType('faqItem')
