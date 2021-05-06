@@ -12,18 +12,47 @@ const WebPreview = ({ document }) => {
   const slug = displayed.content.slug?.current
 
   if (!slug) {
+    //  home page has no slug - special affordance
+    if (displayed._type == 'siteHome') {
+      return (
+        <iframe
+          src={`https://cac-web3.netlify.app/?preview=true`}
+          frameBorder={0}
+          width="100%"
+          height="100%"
+        />
+      )
+    }
+    // ask for a slug
     return <h1>Please set a slug to see a preview</h1>
   }
 
-  const targetURL = url + slug + `/?preview=true`
+  // get url path prefix for each content type
+  const pathPrefixes = {
+    page: '',
+    post: 'blog/',
+    pageSupport: '',
+    pageSimple: '',
+  }
+  const pathPrefix = pathPrefixes[displayed._type]
+
+  const targetURL = url + pathPrefix + slug + `/?preview=true`
   return <iframe src={targetURL} frameBorder={0} width="100%" height="100%" />
 }
 
 export const getDefaultDocumentNode = ({ schemaType }) => {
   // Only show the iframe for documents for which a preview makes sense.
-  if (schemaType === 'page') {
+  if (
+    schemaType === 'page' ||
+    schemaType === 'siteHome' ||
+    schemaType === 'post' ||
+    schemaType === 'pageSupport' ||
+    schemaType === 'pageSimple'
+  ) {
     return S.document().views([
+      // default form
       S.view.form().icon(MdEdit),
+      // custom preview component we built above
       S.view.component(WebPreview).title('Web Preview').icon(MdVisibility),
     ])
   }
@@ -33,10 +62,7 @@ export default () =>
   S.list()
     .title('Content')
     .items([
-      S.listItem()
-        .title('Home Page')
-        .icon(MdHome)
-        .child(S.editor().id('siteHome').schemaType('siteHome').documentId('siteHome')),
+      S.documentListItem().id('siteHome').title('Site Home').schemaType('siteHome').icon(MdHome),
       S.listItem()
         .title('Settings')
         .icon(MdSettings)
