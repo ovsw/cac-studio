@@ -90,8 +90,8 @@ export default {
         layout: 'radio',
         direction: 'horizontal',
       },
-      validation: (Rule) =>
-        Rule.error('You have to select which side menu to show for this page.').required(),
+      // validation: (Rule) =>
+      //   Rule.error('You have to select which side menu to show for this page.').required(),
     },
     // {
     //   name: 'body',
