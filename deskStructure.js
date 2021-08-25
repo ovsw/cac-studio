@@ -74,10 +74,6 @@ export default () =>
           S.list()
             .title('Pages')
             .items([
-              S.documentListItem()
-                .id('prospectiveFamilies')
-                .title('Prospective Families')
-                .schemaType('page'),
               S.listItem()
                 .title('Prospective Families Section Pages')
                 .child(
@@ -134,19 +130,24 @@ export default () =>
                         .id('internationalCampers')
                         .title('International Campers')
                         .schemaType('page'),
-                      S.documentListItem().id('faqs').title('FAQs').schemaType('page'),
                       S.documentListItem()
                         .id('datesAndRates')
                         .title('Dates & Rates')
                         .schemaType('page'),
                       S.documentListItem()
+                        .id('foodSampleMenu')
+                        .title('Food & Sample Menu')
+                        .schemaType('page'),
+                      S.documentListItem()
                         .id('testimoanials')
                         .title('Testimonials')
                         .schemaType('page'),
+                      S.documentListItem().id('faqsProspective').title('FAQs').schemaType('page'),
+                      S.documentListItem().id('activities').title('Activities').schemaType('page'),
+                      S.documentListItem().id('staff').title('Staff').schemaType('page'),
                     ])
                 )
                 .icon(MdFolder),
-              S.documentListItem().id('about').title('About').schemaType('page'),
               S.listItem()
                 .title('About Section Pages')
                 .id('aboutSection')
@@ -167,26 +168,14 @@ export default () =>
                         .title('Unique Location')
                         .schemaType('page'),
                       S.documentListItem()
-                        .id('foodSampleMenu')
-                        .title('Food & Sample Menu')
-                        .schemaType('page'),
-                      S.documentListItem()
                         .id('membershipsPartnerships')
                         .title('Memberships & Partnerships')
                         .schemaType('page'),
                       S.documentListItem().id('alumni').title('Alumni').schemaType('page'),
-                      S.documentListItem()
-                        .id('photoGallery')
-                        .title('Photo Gallery')
-                        .schemaType('page'),
-                      S.documentListItem().id('videos').title('Videos').schemaType('page'),
+                      S.documentListItem().id('videos').title('Photos & Videos').schemaType('page'),
                     ])
                 )
                 .icon(MdFolder),
-              S.documentListItem()
-                .id('currentFamilies')
-                .title('Current Families')
-                .schemaType('page'),
               S.listItem()
                 .title('Current Families Section Pages')
                 .icon(MdFolder)
@@ -202,6 +191,7 @@ export default () =>
                         .id('parentsGuide')
                         .title("Parent's Guide")
                         .schemaType('page'),
+                      S.documentListItem().id('faqs').title('FAQs').schemaType('page'),
                       S.documentListItem()
                         .id('gettingToCamp')
                         .title('Getting to Camp')
@@ -280,28 +270,27 @@ export default () =>
                         .schemaType('page'),
                     ])
                 ),
-              S.documentListItem().id('staff').title('Staff').schemaType('page'),
-              S.listItem()
-                .title('Staff Pages')
-                .icon(MdFolder)
-                .child(
-                  S.list()
-                    .title('Staff Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('availablePositions')
-                        .title('Available Positions')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('staffApplication')
-                        .title('Staff Application')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('communityInitiatives')
-                        .title('Community Initiatives')
-                        .schemaType('page'),
-                    ])
-                ),
+              // S.listItem()
+              //   .title('Staff Pages')
+              //   .icon(MdFolder)
+              //   .child(
+              //     S.list()
+              //       .title('Staff Pages')
+              //       .items([
+              //         S.documentListItem()
+              //           .id('availablePositions')
+              //           .title('Available Positions')
+              //           .schemaType('page'),
+              //         S.documentListItem()
+              //           .id('staffApplication')
+              //           .title('Staff Application')
+              //           .schemaType('page'),
+              //         S.documentListItem()
+              //           .id('communityInitiatives')
+              //           .title('Community Initiatives')
+              //           .schemaType('page'),
+              //       ])
+              //   ),
               S.documentListItem()
                 .id('youthLeadershipProgram')
                 .title('Youth Leadership Program')
