@@ -25,30 +25,30 @@ export default {
                 //   apiId: '1e783139-c816-42c5-a6cf-95d7f294ccaf'
                 // },
                 {
-                  buildHookId: '6041a2caec518b4d3d3f8408',
+                  buildHookId: '6123cba23119901b410ca08d',
                   title: 'CAC Website Front-End',
                   name: 'cac-app',
-                  apiId: '84af6dba-0ec6-4acd-b484-0983c715dd25'
-                }
-              ]
-            }
-          }
+                  apiId: 'f9d52d85-7e1c-42b6-aa89-1cc7d47526b5',
+                },
+              ],
+            },
+          },
         ],
         data: [
           {
             title: 'GitHub repo',
             value: 'https://github.com/ovsw/lrw-app',
-            category: 'Code'
+            category: 'Code',
           },
-          {title: 'Frontend', value: 'https://lrw-app.netlify.com', category: 'apps'}
-        ]
-      }
+          { title: 'Frontend', value: 'https://lrw-app.netlify.com', category: 'apps' },
+        ],
+      },
     },
     // {name: 'project-users', layout: {height: 'auto'}},
     {
       name: 'document-list',
-      options: {title: 'Recent blog posts', order: '_createdAt desc', types: ['post']},
-      layout: {width: 'medium'}
-    }
-  ]
+      options: { title: 'Recent blog posts', order: '_createdAt desc', types: ['post'] },
+      layout: { width: 'medium' },
+    },
+  ],
 }
