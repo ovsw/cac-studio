@@ -270,27 +270,31 @@ export default () =>
                         .schemaType('page'),
                     ])
                 ),
-              // S.listItem()
-              //   .title('Staff Pages')
-              //   .icon(MdFolder)
-              //   .child(
-              //     S.list()
-              //       .title('Staff Pages')
-              //       .items([
-              //         S.documentListItem()
-              //           .id('availablePositions')
-              //           .title('Available Positions')
-              //           .schemaType('page'),
-              //         S.documentListItem()
-              //           .id('staffApplication')
-              //           .title('Staff Application')
-              //           .schemaType('page'),
-              //         S.documentListItem()
-              //           .id('communityInitiatives')
-              //           .title('Community Initiatives')
-              //           .schemaType('page'),
-              //       ])
-              //   ),
+              S.listItem()
+                .title('Staff Pages')
+                .icon(MdFolder)
+                .child(
+                  S.list()
+                    .title('Staff Pages')
+                    .items([
+                      S.documentListItem()
+                        .id('availablePositions')
+                        .title('Available Positions')
+                        .schemaType('page'),
+                      S.documentListItem()
+                        .id('staffApplication')
+                        .title('Staff Application')
+                        .schemaType('page'),
+                      S.documentListItem()
+                        .id('communityInitiatives')
+                        .title('Community Initiatives')
+                        .schemaType('page'),
+                      S.documentListItem()
+                        .id('internationalStaff')
+                        .title('International Staff')
+                        .schemaType('page'),
+                    ])
+                ),
               S.documentListItem()
                 .id('youthLeadershipProgram')
                 .title('Youth Leadership Program')
