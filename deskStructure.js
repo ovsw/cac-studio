@@ -14,6 +14,15 @@ import pagesStructure from './deskStructure.config.json'
 
 const PREVIEW_BASE_URL = 'https://cac-web3.netlify.app/'
 const DESK_DIAGNOSTIC_PREFIX = '[sanity-desk]'
+const CONNECTION_WARNING_DELAY_MS = 15000
+
+function getIsOnline() {
+  if (typeof navigator === 'undefined') {
+    return true
+  }
+
+  return navigator.onLine
+}
 
 function getRouteContext() {
   if (typeof window === 'undefined') {
@@ -70,6 +79,29 @@ function DeskErrorState({ title, message, payload }) {
   )
 }
 
+function DeskLoadingState({ title, message, tone = 'default' }) {
+  const accentColor = tone === 'offline' ? '#92400e' : '#1d4ed8'
+  const backgroundColor = tone === 'offline' ? '#fffbeb' : '#eff6ff'
+  const borderColor = tone === 'offline' ? '#f59e0b' : '#93c5fd'
+
+  return (
+    <div style={{ padding: '1.5rem', lineHeight: 1.5 }}>
+      <div
+        style={{
+          backgroundColor,
+          border: `1px solid ${borderColor}`,
+          borderRadius: '0.75rem',
+          color: accentColor,
+          padding: '1rem 1.25rem',
+        }}
+      >
+        <h2 style={{ color: accentColor, margin: 0 }}>{title}</h2>
+        <p style={{ color: '#1f2937', marginBottom: 0, marginTop: '0.5rem' }}>{message}</p>
+      </div>
+    </div>
+  )
+}
+
 class DeskPaneErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -119,9 +151,74 @@ class DeskPaneErrorBoundary extends React.Component {
   }
 }
 
-function wrapPaneComponent(paneId, paneTitle, Component) {
+function useOnlineStatus() {
+  const [isOnline, setIsOnline] = React.useState(getIsOnline)
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  return isOnline
+}
+
+function PaneLoadingWatchdog({ isLoading, paneTitle, children }) {
+  const isOnline = useOnlineStatus()
+  const [showDelayedWarning, setShowDelayedWarning] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!isLoading || !isOnline) {
+      setShowDelayedWarning(false)
+      return undefined
+    }
+
+    const timeoutId = setTimeout(() => {
+      setShowDelayedWarning(true)
+    }, CONNECTION_WARNING_DELAY_MS)
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [isLoading, isOnline])
+
+  return (
+    <React.Fragment>
+      {isLoading && !isOnline && (
+        <DeskLoadingState
+          title={`${paneTitle} is offline`}
+          message='The Studio is offline. Content may not load until the connection returns.'
+          tone='offline'
+        />
+      )}
+      {isLoading && isOnline && showDelayedWarning && (
+        <DeskLoadingState
+          title={`${paneTitle} is taking longer than expected`}
+          message='This pane is still loading. Check your internet connection or reload the Studio if it does not recover.'
+        />
+      )}
+      {children}
+    </React.Fragment>
+  )
+}
+
+function wrapPaneComponent(paneId, paneTitle, Component, options = {}) {
+  const getIsLoading = options.getIsLoading || (() => false)
+
   return function WrappedPane(props) {
     const displayed = props.document && props.document.displayed ? props.document.displayed : {}
+    const isLoading = Boolean(getIsLoading(props))
 
     return (
       <DeskPaneErrorBoundary
@@ -132,7 +229,9 @@ function wrapPaneComponent(paneId, paneTitle, Component) {
           schemaType: displayed._type,
         }}
       >
-        <Component {...props} />
+        <PaneLoadingWatchdog isLoading={isLoading} paneTitle={paneTitle}>
+          <Component {...props} />
+        </PaneLoadingWatchdog>
       </DeskPaneErrorBoundary>
     )
   }
@@ -144,9 +243,9 @@ const WebPreview = ({ document }) => {
 
   if (!displayed._type) {
     return (
-      <DeskErrorState
-        title='Preview unavailable'
-        message='The document payload is not ready yet. Reload the pane if this state persists.'
+      <DeskLoadingState
+        title='Loading preview'
+        message='Waiting for the document payload before the preview can be rendered.'
       />
     )
   }
@@ -178,7 +277,12 @@ const WebPreview = ({ document }) => {
   return <iframe src={targetURL} frameBorder={0} width='100%' height='100%' />
 }
 
-const SafeWebPreview = wrapPaneComponent('webPreview', 'Web Preview', WebPreview)
+const SafeWebPreview = wrapPaneComponent('webPreview', 'Web Preview', WebPreview, {
+  getIsLoading: (props) => {
+    const displayed = props.document && props.document.displayed ? props.document.displayed : {}
+    return !displayed._type
+  },
+})
 
 function createDocumentListItem(definition) {
   return S.documentListItem()
