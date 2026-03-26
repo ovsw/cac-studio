@@ -1,0 +1,113 @@
+[
+  {
+    "id": "prospectiveFamiliesSectionPages",
+    "title": "Prospective Families Section Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "theCacExperience", "title": "The CAC Experience", "kind": "document", "schemaType": "page" },
+      { "id": "generalProgram", "title": "General Program", "kind": "document", "schemaType": "page" },
+      { "id": "specialtyPrograms", "title": "Specialty Programs", "kind": "document", "schemaType": "page" },
+      {
+        "id": "specialtyProgramsPages",
+        "title": "Specialty Programs Pages",
+        "kind": "folder",
+        "items": [
+          { "id": "gymnasticsProgram", "title": "Gymnastics", "kind": "document", "schemaType": "page" },
+          { "id": "trampolineProgram", "title": "Trampoline", "kind": "document", "schemaType": "page" },
+          { "id": "aerialsProgram", "title": "Aerials", "kind": "document", "schemaType": "page" },
+          { "id": "waterskyWakeboardProgram", "title": "Waterski & Wakeboard", "kind": "document", "schemaType": "page" }
+        ]
+      },
+      { "id": "accomodationFacilities", "title": "Accomodation & Facilities", "kind": "document", "schemaType": "page" },
+      { "id": "healthSafety", "title": "Health & Safety", "kind": "document", "schemaType": "page" },
+      { "id": "internationalCampers", "title": "International Campers", "kind": "document", "schemaType": "page" },
+      { "id": "datesAndRates", "title": "Dates & Rates", "kind": "document", "schemaType": "page" },
+      { "id": "foodSampleMenu", "title": "Food & Sample Menu", "kind": "document", "schemaType": "page" },
+      { "id": "testimoanials", "title": "Testimonials", "kind": "document", "schemaType": "page" },
+      { "id": "faqsProspective", "title": "FAQs", "kind": "document", "schemaType": "page" },
+      { "id": "activities", "title": "Activities", "kind": "document", "schemaType": "page" },
+      { "id": "staff", "title": "Staff", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  {
+    "id": "aboutSectionPages",
+    "title": "About Section Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "historyAndGoal", "title": "History and Goal", "kind": "document", "schemaType": "page" },
+      { "id": "greatLeadership", "title": "Great Leadership", "kind": "document", "schemaType": "page" },
+      { "id": "uniqueLocation", "title": "Unique Location", "kind": "document", "schemaType": "page" },
+      { "id": "membershipsPartnerships", "title": "Memberships & Partnerships", "kind": "document", "schemaType": "page" },
+      { "id": "alumni", "title": "Alumni", "kind": "document", "schemaType": "page" },
+      { "id": "videos", "title": "Photos & Videos", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  {
+    "id": "currentFamiliesSectionPages",
+    "title": "Current Families Section Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "whatToBringToCamp", "title": "What to bring to camp", "kind": "document", "schemaType": "page" },
+      { "id": "parentsGuide", "title": "Parent's Guide", "kind": "document", "schemaType": "page" },
+      { "id": "faqs", "title": "FAQs", "kind": "document", "schemaType": "page" },
+      { "id": "gettingToCamp", "title": "Getting to Camp", "kind": "document", "schemaType": "page" },
+      {
+        "id": "gettingToCampPages",
+        "title": "Getting to Camp pages",
+        "kind": "folder",
+        "items": [
+          { "id": "travelByBus", "title": "Travel by Bus", "kind": "document", "schemaType": "page" },
+          { "id": "travelByCar", "title": "Travel by Car", "kind": "document", "schemaType": "page" },
+          { "id": "internationalCampersTravel", "title": "International Campers", "kind": "document", "schemaType": "page" }
+        ]
+      },
+      { "id": "stayInTouchWithYourCamper", "title": "Stay in touch with your camper", "kind": "document", "schemaType": "page" },
+      {
+        "id": "stayInTouchWithYourCamperPages",
+        "title": "Stay in Touch pages",
+        "kind": "folder",
+        "items": [
+          { "id": "visitorDays", "title": "Visitor's Days", "kind": "document", "schemaType": "page" },
+          { "id": "placesToStay", "title": "Places to Stay", "kind": "document", "schemaType": "page" }
+        ]
+      },
+      { "id": "campPictures", "title": "Camp Pictures", "kind": "document", "schemaType": "page" },
+      { "id": "campVideo", "title": "Camp Video", "kind": "document", "schemaType": "page" },
+      { "id": "parentLogin", "title": "Parent Log-in", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  { "id": "nccpAdultCamp", "title": "NCCP & Adult Camp", "kind": "document", "schemaType": "page" },
+  {
+    "id": "nccpAdultCampPages",
+    "title": "NCCP & Adult Camp Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "adultCamp", "title": "Adult Camp", "kind": "document", "schemaType": "page" },
+      { "id": "nccpCourses", "title": "NCCP Courses", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  {
+    "id": "staffPages",
+    "title": "Staff Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "availablePositions", "title": "Available Positions", "kind": "document", "schemaType": "page" },
+      { "id": "staffApplication", "title": "Staff Application", "kind": "document", "schemaType": "page" },
+      { "id": "communityInitiatives", "title": "Community Initiatives", "kind": "document", "schemaType": "page" },
+      { "id": "internationalStaff", "title": "International Staff", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  { "id": "youthLeadershipProgram", "title": "Youth Leadership Program", "kind": "document", "schemaType": "page" },
+  {
+    "id": "youthLeadershipProgramPages",
+    "title": "Youth Leadership Program Pages",
+    "kind": "folder",
+    "items": [
+      { "id": "leadershipProgramOne", "title": "Leadership One", "kind": "document", "schemaType": "page" },
+      { "id": "leadershipProgramTwo", "title": "Leadership Two", "kind": "document", "schemaType": "page" },
+      { "id": "juniorStaff", "title": "Junior Staff", "kind": "document", "schemaType": "page" }
+    ]
+  },
+  { "id": "joinOurTeam", "title": "Join Our Team", "kind": "document", "schemaType": "page" },
+  { "id": "blogHome", "title": "News / Blog Home Page", "kind": "document", "schemaType": "pageSpecial" }
+]

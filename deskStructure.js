@@ -1,48 +1,276 @@
 import React from 'react'
 import S from '@sanity/desk-tool/structure-builder'
-import { MdSettings, MdFolder, MdMap, MdHome, MdEdit, MdVisibility } from 'react-icons/md'
+import {
+  MdSettings,
+  MdFolder,
+  MdHome,
+  MdEdit,
+  MdVisibility,
+  MdWarning,
+  MdDescription,
+} from 'react-icons/md'
 import { FaComment } from 'react-icons/fa'
+import pagesStructure from './deskStructure.config.json'
 
-const hiddenDocTypes = (listItem) =>
-  !['category', 'author', 'post', 'page', 'siteSettings', 'mapMarker'].includes(listItem.getId())
+const PREVIEW_BASE_URL = 'https://cac-web3.netlify.app/'
+const DESK_DIAGNOSTIC_PREFIX = '[sanity-desk]'
 
-const url = 'https://cac-web3.netlify.app/'
+function getRouteContext() {
+  if (typeof window === 'undefined') {
+    return {}
+  }
 
-const WebPreview = ({ document }) => {
-  const { displayed } = document
-  const slug = displayed.content.slug?.current
+  return {
+    pathname: window.location.pathname,
+    search: window.location.search,
+    hash: window.location.hash,
+  }
+}
 
-  if (!slug) {
-    //  home page has no slug - special affordance
-    if (displayed._type == 'siteHome') {
+function toErrorPayload(error) {
+  if (!error) {
+    return null
+  }
+
+  return {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+  }
+}
+
+function logDeskError(meta, error, extra = {}) {
+  const payload = {
+    timestamp: new Date().toISOString(),
+    ...meta,
+    ...extra,
+    route: getRouteContext(),
+    error: toErrorPayload(error),
+  }
+
+  // Keep diagnostics in the console so editors can report exact context.
+  console.error(DESK_DIAGNOSTIC_PREFIX, payload)
+  return payload
+}
+
+function DeskErrorState({ title, message, payload }) {
+  return (
+    <div style={{ padding: '1.5rem', lineHeight: 1.5 }}>
+      <h2 style={{ marginTop: 0 }}>{title}</h2>
+      <p>{message}</p>
+      {payload && (
+        <details>
+          <summary>Diagnostic context</summary>
+          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {JSON.stringify(payload, null, 2)}
+          </pre>
+        </details>
+      )}
+    </div>
+  )
+}
+
+class DeskPaneErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      error: null,
+      payload: null,
+    }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+
+  componentDidCatch(error, info) {
+    const payload = logDeskError(
+      {
+        scope: 'pane',
+        paneId: this.props.paneId,
+        paneTitle: this.props.paneTitle,
+      },
+      error,
+      {
+        componentStack: info.componentStack,
+        ...this.props.context,
+      }
+    )
+
+    this.setState({ payload })
+  }
+
+  render() {
+    const { children, paneTitle } = this.props
+    const { error, payload } = this.state
+
+    if (error) {
       return (
-        <iframe
-          src={`https://cac-web3.netlify.app/?preview=true`}
-          frameBorder={0}
-          width="100%"
-          height="100%"
+        <DeskErrorState
+          title={`${paneTitle} failed to render`}
+          message='This desk pane hit a runtime error. Reload the Studio and include the console output if the problem persists.'
+          payload={payload}
         />
       )
     }
-    // ask for a slug
+
+    return children
+  }
+}
+
+function wrapPaneComponent(paneId, paneTitle, Component) {
+  return function WrappedPane(props) {
+    const displayed = props.document && props.document.displayed ? props.document.displayed : {}
+
+    return (
+      <DeskPaneErrorBoundary
+        paneId={paneId}
+        paneTitle={paneTitle}
+        context={{
+          documentId: displayed._id,
+          schemaType: displayed._type,
+        }}
+      >
+        <Component {...props} />
+      </DeskPaneErrorBoundary>
+    )
+  }
+}
+
+const WebPreview = ({ document }) => {
+  const displayed = document && document.displayed ? document.displayed : {}
+  const slug = displayed.content && displayed.content.slug ? displayed.content.slug.current : null
+
+  if (!displayed._type) {
+    return (
+      <DeskErrorState
+        title='Preview unavailable'
+        message='The document payload is not ready yet. Reload the pane if this state persists.'
+      />
+    )
+  }
+
+  if (!slug) {
+    if (displayed._type === 'siteHome') {
+      return (
+        <iframe
+          src={`${PREVIEW_BASE_URL}?preview=true`}
+          frameBorder={0}
+          width='100%'
+          height='100%'
+        />
+      )
+    }
+
     return <h1>Please set a slug to see a preview</h1>
   }
 
-  // get url path prefix for each content type
   const pathPrefixes = {
     page: '',
     post: 'blog/',
     pageSupport: '',
     pageSimple: '',
   }
-  const pathPrefix = pathPrefixes[displayed._type]
 
-  const targetURL = url + pathPrefix + slug + `/?preview=true`
-  return <iframe src={targetURL} frameBorder={0} width="100%" height="100%" />
+  const pathPrefix = pathPrefixes[displayed._type] || ''
+  const targetURL = `${PREVIEW_BASE_URL}${pathPrefix}${slug}/?preview=true`
+  return <iframe src={targetURL} frameBorder={0} width='100%' height='100%' />
+}
+
+const SafeWebPreview = wrapPaneComponent('webPreview', 'Web Preview', WebPreview)
+
+function createDocumentListItem(definition) {
+  return S.documentListItem()
+    .id(definition.id)
+    .title(definition.title)
+    .schemaType(definition.schemaType)
+    .icon(MdDescription)
+}
+
+function createErrorPane({ id, title, payload }) {
+  return S.component()
+    .id(`${id}__errorPane`)
+    .title(title)
+    .component(() => (
+      <DeskErrorState
+        title={`${title} failed to load`}
+        message='This desk section could not be resolved. Reload the Studio and include the console output if the problem persists.'
+        payload={payload}
+      />
+    ))
+}
+
+function createErrorListItem({ id, title, error, path }) {
+  const payload = logDeskError(
+    {
+      scope: 'structure',
+      sectionId: id,
+      sectionTitle: title,
+    },
+    error,
+    {
+      path,
+    }
+  )
+
+  return S.listItem()
+    .id(`${id}__error`)
+    .title(`${title} (Error)`)
+    .icon(MdWarning)
+    .child(createErrorPane({ id, title, payload }))
+}
+
+function buildStructureItem(definition, ancestors = []) {
+  if (definition.kind === 'document') {
+    return createDocumentListItem(definition)
+  }
+
+  if (definition.kind !== 'folder') {
+    throw new Error(`Unsupported structure item kind "${definition.kind}"`)
+  }
+
+  const path = ancestors.concat(definition.id).join(' > ')
+
+  try {
+    if (!Array.isArray(definition.items)) {
+      throw new Error(`Folder "${definition.id}" is missing an items array`)
+    }
+
+    const childList = S.list()
+      .id(`${definition.id}__list`)
+      .title(definition.title)
+      .items(definition.items.map((item) => buildStructureItem(item, ancestors.concat(definition.id))))
+
+    return S.listItem()
+      .id(definition.id)
+      .title(definition.title)
+      .icon(MdFolder)
+      .child(childList)
+  } catch (error) {
+    return createErrorListItem({
+      id: definition.id,
+      title: definition.title,
+      error,
+      path,
+    })
+  }
+}
+
+function buildPagesBranch() {
+  return S.listItem()
+    .id('pages')
+    .title('Pages')
+    .icon(MdFolder)
+    .child(
+      S.list()
+        .id('pages__list')
+        .title('Pages')
+        .items(pagesStructure.map((item) => buildStructureItem(item, ['pages'])))
+    )
 }
 
 export const getDefaultDocumentNode = ({ schemaType }) => {
-  // Only show the iframe for documents for which a preview makes sense.
   if (
     schemaType === 'page' ||
     schemaType === 'siteHome' ||
@@ -51,330 +279,60 @@ export const getDefaultDocumentNode = ({ schemaType }) => {
     schemaType === 'pageSimple'
   ) {
     return S.document().views([
-      // default form
       S.view.form().icon(MdEdit),
-      // custom preview component we built above
-      S.view.component(WebPreview).title('Web Preview').icon(MdVisibility),
+      S.view.component(SafeWebPreview).title('Web Preview').icon(MdVisibility),
     ])
   }
 }
 
 export default () =>
   S.list()
+    .id('content')
     .title('Content')
     .items([
       S.documentListItem().id('siteHome').title('Site Home').schemaType('siteHome').icon(MdHome),
       S.listItem()
+        .id('settings')
         .title('Settings')
         .icon(MdSettings)
         .child(S.editor().id('siteSettings').schemaType('siteSettings').documentId('siteSettings')),
+      buildPagesBranch(),
       S.listItem()
-        .title('Pages')
-        .child(
-          S.list()
-            .title('Pages')
-            .items([
-              S.listItem()
-                .title('Prospective Families Section Pages')
-                .child(
-                  S.list()
-                    .title('Prospective Families Section Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('theCacExperience')
-                        .title('The CAC Experience')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('generalProgram')
-                        .title('General Program')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('specialtyPrograms')
-                        .title('Specialty Programs')
-                        .schemaType('page'),
-                      S.listItem()
-                        .title('Specialty Programs Pages')
-                        .id('programsPages')
-                        .child(
-                          S.list()
-                            .title('Specialty Programs Pages')
-                            .items([
-                              S.documentListItem()
-                                .id('gymnasticsProgram')
-                                .title('Gymnastics')
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('trampolineProgram')
-                                .title('Trampoline')
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('aerialsProgram')
-                                .title('Aerials')
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('waterskyWakeboardProgram')
-                                .title('Waterski & Wakeboard')
-                                .schemaType('page'),
-                            ])
-                        )
-                        .icon(MdFolder),
-                      S.documentListItem()
-                        .id('accomodationFacilities')
-                        .title('Accomodation & Facilities')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('healthSafety')
-                        .title('Health & Safety')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('internationalCampers')
-                        .title('International Campers')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('datesAndRates')
-                        .title('Dates & Rates')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('foodSampleMenu')
-                        .title('Food & Sample Menu')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('testimoanials')
-                        .title('Testimonials')
-                        .schemaType('page'),
-                      S.documentListItem().id('faqsProspective').title('FAQs').schemaType('page'),
-                      S.documentListItem().id('activities').title('Activities').schemaType('page'),
-                      S.documentListItem().id('staff').title('Staff').schemaType('page'),
-                    ])
-                )
-                .icon(MdFolder),
-              S.listItem()
-                .title('About Section Pages')
-                .id('aboutSection')
-                .child(
-                  S.list()
-                    .title('About Section Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('historyAndGoal')
-                        .title('History and Goal')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('greatLeadership')
-                        .title('Great Leadership')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('uniqueLocation')
-                        .title('Unique Location')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('membershipsPartnerships')
-                        .title('Memberships & Partnerships')
-                        .schemaType('page'),
-                      S.documentListItem().id('alumni').title('Alumni').schemaType('page'),
-                      S.documentListItem().id('videos').title('Photos & Videos').schemaType('page'),
-                    ])
-                )
-                .icon(MdFolder),
-              S.listItem()
-                .title('Current Families Section Pages')
-                .icon(MdFolder)
-                .child(
-                  S.list()
-                    .title('Current Families Section Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('whatToBringToCamp')
-                        .title('What to bring to camp')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('parentsGuide')
-                        .title("Parent's Guide")
-                        .schemaType('page'),
-                      S.documentListItem().id('faqs').title('FAQs').schemaType('page'),
-                      S.documentListItem()
-                        .id('gettingToCamp')
-                        .title('Getting to Camp')
-                        .schemaType('page'),
-                      S.listItem()
-                        .title('Getting to Camp pages')
-                        .id('gettingToCampPages')
-                        .child(
-                          S.list()
-                            .title('Getting to Camp Pages')
-                            .items([
-                              S.documentListItem()
-                                .id('travelByBus')
-                                .title('Travel by Bus')
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('travelByCar')
-                                .title('Travel by Car')
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('internationalCampersTravel')
-                                .title('International Campers')
-                                .schemaType('page'),
-                            ])
-                        )
-                        .icon(MdFolder),
-                      S.documentListItem()
-                        .id('stayInTouchWithYourCamper')
-                        .title('Stay in touch with your camper')
-                        .schemaType('page'),
-                      S.listItem()
-                        .title('Stay in Touch pages')
-                        .id('stayInTouchWithYourCamperPages')
-                        .child(
-                          S.list()
-                            .title('Stay in touch Pages')
-                            .items([
-                              S.documentListItem()
-                                .id('visitorDays')
-                                .title("Visitor's Days")
-                                .schemaType('page'),
-                              S.documentListItem()
-                                .id('placesToStay')
-                                .title('Places to Stay')
-                                .schemaType('page'),
-                            ])
-                        )
-                        .icon(MdFolder),
-                      S.documentListItem()
-                        .id('campPictures')
-                        .title('Camp Pictures')
-                        .schemaType('page'),
-                      S.documentListItem().id('campVideo').title('Camp Video').schemaType('page'),
-                      S.documentListItem()
-                        .id('parentLogin')
-                        .title('Parent Log-in')
-                        .schemaType('page'),
-                    ])
-                ),
-              S.documentListItem()
-                .id('nccpAdultCamp')
-                .title('NCCP & Adult Camp')
-                .schemaType('page'),
-              S.listItem()
-                .title('NCCP & Adult Camp Pages')
-                .id('nccpAdultCampPages')
-                .icon(MdFolder)
-                .child(
-                  S.list()
-                    .title('NCCP & Adult Camp Pages')
-                    .items([
-                      S.documentListItem().id('adultCamp').title('Adult Camp').schemaType('page'),
-                      S.documentListItem()
-                        .id('nccpCourses')
-                        .title('NCCP Courses')
-                        .schemaType('page'),
-                    ])
-                ),
-              S.listItem()
-                .title('Staff Pages')
-                .icon(MdFolder)
-                .child(
-                  S.list()
-                    .title('Staff Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('availablePositions')
-                        .title('Available Positions')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('staffApplication')
-                        .title('Staff Application')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('communityInitiatives')
-                        .title('Community Initiatives')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('internationalStaff')
-                        .title('International Staff')
-                        .schemaType('page'),
-                    ])
-                ),
-              S.documentListItem()
-                .id('youthLeadershipProgram')
-                .title('Youth Leadership Program')
-                .schemaType('page'),
-
-              S.listItem()
-                .title('Youth Leadership Program Pages')
-                .icon(MdFolder)
-                .child(
-                  S.list()
-                    .title('YLP Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('leadershipProgramOne')
-                        .title('Leadership One')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('leadershipProgramTwo')
-                        .title('Leadership Two')
-                        .schemaType('page'),
-                      S.documentListItem()
-                        .id('juniorStaff')
-                        .title('Junior Staff')
-                        .schemaType('page'),
-                    ])
-                ),
-              S.documentListItem().id('joinOurTeam').title('Join Our Team').schemaType('page'),
-              S.documentListItem()
-                .id('blogHome')
-                .title('News / Blog Home Page')
-                .schemaType('pageSpecial'),
-            ])
-        ),
-      S.listItem()
+        .id('reusableSections')
         .title('Reusable Sections')
         .schemaType('reusableSection')
-        .child(S.documentTypeList('reusableSection').title('Reusable Sections')),
+        .child(S.documentTypeList('reusableSection').id('reusableSections__list').title('Reusable Sections')),
       S.divider(),
       S.listItem()
+        .id('blogPosts')
         .title('Blog Posts')
         .schemaType('post')
-        .child(S.documentTypeList('post').title('Blog Posts')),
+        .child(S.documentTypeList('post').id('blogPosts__list').title('Blog Posts')),
       S.listItem()
+        .id('blogAuthors')
         .title('Blog Authors')
         .schemaType('author')
-        .child(S.documentTypeList('author').title('Blog Authors')),
+        .child(S.documentTypeList('author').id('blogAuthors__list').title('Blog Authors')),
       S.divider(),
       S.listItem()
+        .id('testimonials')
         .title('Testimonials')
         .icon(FaComment)
-        .child(S.documentTypeList('testimonial').title('Testimonials')),
+        .child(S.documentTypeList('testimonial').id('testimonials__list').title('Testimonials')),
       S.divider(),
       S.listItem()
+        .id('faqItems')
         .title('FAQ Items')
         .schemaType('faqItem')
-        .child(S.documentTypeList('faqItem').title('FAQ Items')),
+        .child(S.documentTypeList('faqItem').id('faqItems__list').title('FAQ Items')),
       S.listItem()
+        .id('supportPages')
         .title('Support Pages')
         .schemaType('pageSupport')
-        .child(S.documentTypeList('pageSupport').title('Support Pages')),
+        .child(S.documentTypeList('pageSupport').id('supportPages__list').title('Support Pages')),
       S.listItem()
+        .id('simplePages')
         .title('Simple Pages')
         .schemaType('pageSimple')
-        .child(S.documentTypeList('pageSimple').title('Simple Pages')),
-      // S.listItem()
-      //   .title('Interactive Map')
-      //   .icon(MdMap)
-      //   .schemaType('mapMarker')
-      //   .child(S.documentTypeList('mapMarker').title('Map Markers')),
-      // S.listItem()
-      //   .title('Authors')
-      //   .icon(MdPerson)
-      //   .schemaType('author')
-      //   .child(S.documentTypeList('author').title('Authors')),
-      // S.listItem()
-      //   .title('Categories')
-      //   .schemaType('category')
-      //   .child(S.documentTypeList('category').title('Categories')),
-      // This returns an array of all the document types
-      // defined in schema.js. We filter out those that we have
-      // defined the structure above
-      // ...S.documentTypeListItems().filter(hiddenDocTypes)
+        .child(S.documentTypeList('pageSimple').id('simplePages__list').title('Simple Pages')),
     ])
